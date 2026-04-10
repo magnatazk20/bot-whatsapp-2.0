@@ -84,8 +84,8 @@ export async function connect() {
     auth: state,
     shouldIgnoreJid: (jid) =>
       isJidBroadcast(jid) || isJidStatusBroadcast(jid) || isJidNewsletter(jid),
-    connectTimeoutMs: 20_000,
-    keepAliveIntervalMs: 30_000,
+    connectTimeoutMs: 60_000,
+    keepAliveIntervalMs: 15_000,
     maxMsgRetryCount: 5,
     markOnlineOnConnect: true,
     syncFullHistory: false,
@@ -203,7 +203,6 @@ O prefixo padrão definido no config.js é ${PREFIX}`,
       );
       badMacHandler.resetErrorCount();
     } else if (connection === "connecting") {
-      infoLog("Conectando...");
     } else if (!connection) {
       infoLog("Atualizando conexão... aguardando status do WhatsApp Web.");
     } else {
