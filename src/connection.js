@@ -113,6 +113,10 @@ export async function connect() {
     const code = await socket.requestPairingCode(onlyNumbers(phoneNumber));
 
     console.log(`Código de pareamento: ${formatPairingCode(code)}`);
+    infoLog(
+      "Abra o WhatsApp no celular > Aparelhos conectados > Conectar um aparelho > insira o código acima.",
+    );
+    infoLog("Aguardando confirmação do pareamento no celular...");
   }
 
   socket.ev.on("connection.update", async (update) => {
@@ -200,10 +204,10 @@ O prefixo padrão definido no config.js é ${PREFIX}`,
       badMacHandler.resetErrorCount();
     } else if (connection === "connecting") {
       infoLog("Conectando...");
+    } else if (!connection) {
+      infoLog("Atualizando conexão... aguardando status do WhatsApp Web.");
     } else {
-      infoLog(
-        `Atualizando conexão... estado=${connection ?? "desconhecido"}`,
-      );
+      infoLog(`Atualizando conexão... estado=${connection}`);
     }
   });
 
