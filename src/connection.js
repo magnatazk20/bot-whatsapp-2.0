@@ -148,54 +148,60 @@ export async function connect() {
       }
 
       if (statusCode === DisconnectReason.loggedOut) {
-        errorLog("Bot desconectado!");
-      } else {
-        switch (statusCode) {
-          case DisconnectReason.badSession:
-            warningLog("Sessão inválida!");
+        errorLog("Bot desconectado! Sessão expirada/deslogada no aparelho.");
+        return;
+      }
 
-            const sessionError = new Error("Bad session detected");
-            if (badMacHandler.handleError(sessionError, "badSession")) {
-              if (badMacHandler.hasReachedLimit()) {
-                warningLog(
-                  "Limite de erros de sessão atingido. Limpando arquivos de sessão...",
-                );
-                badMacHandler.clearProblematicSessionFiles();
-                badMacHandler.resetErrorCount();
-              }
+      switch (statusCode) {
+        case DisconnectReason.badSession:
+          warningLog("Sessão inválida!");
+
+          const sessionError = new Error("Bad session detected");
+          if (badMacHandler.handleError(sessionError, "badSession")) {
+            if (badMacHandler.hasReachedLimit()) {
+              warningLog(
+                "Limite de erros de sessão atingido. Limpando arquivos de sessão...",
+              );
+              badMacHandler.clearProblematicSessionFiles();
+              badMacHandler.resetErrorCount();
             }
-            break;
-          case DisconnectReason.connectionClosed:
-            warningLog("Conexão fechada!");
-            break;
-          case DisconnectReason.connectionLost:
-            warningLog("Conexão perdida!");
-            break;
-          case DisconnectReason.connectionReplaced:
-            warningLog("Conexão substituída!");
-            break;
-          case DisconnectReason.multideviceMismatch:
-            warningLog("Dispositivo incompatível!");
-            break;
-          case DisconnectReason.forbidden:
-            warningLog("Conexão proibida!");
-            break;
-          case DisconnectReason.restartRequired:
-            infoLog('Me reinicie por favor! Digite "npm start".');
-            break;
-          case DisconnectReason.unavailableService:
-            warningLog("Serviço indisponível!");
-            break;
-        }
+          }
+          break;
+        case DisconnectReason.connectionClosed:
+          warningLog("Conexão fechada!");
+          break;
+        case DisconnectReason.connectionLost:
+          warningLog("Conexão perdida!");
+          break;
+        case DisconnectReason.connectionReplaced:
+          warningLog("Conexão substituída!");
+          break;
+        case DisconnectReason.multideviceMismatch:
+          warningLog("Dispositivo incompatível!");
+          break;
+        case DisconnectReason.forbidden:
+          warningLog("Conexão proibida!");
+          return;
+        case DisconnectReason.restartRequired:
+          infoLog("Reinicialização de sessão solicitada pelo WhatsApp.");
+          break;
+        case DisconnectReason.unavailableService:
+          warningLog("Serviço indisponível!");
+          break;
+      }
 
+      setTimeout(async () => {
         const newSocket = await connect();
         load(newSocket);
-      }
+      }, 3000);
     } else if (connection === "open") {
       clearScreenWithBanner();
       successLog("✅ Bot iniciado com sucesso!");
       successLog("Fui conectado com sucesso!");
-      infoLog("Versão do WhatsApp Web: " + WAWEB_VERSION.join("."));
+      infoLog(
+        "Versão do WhatsApp Web: " +
+          (Array.isArray(WAWEB_VERSION) ? WAWEB_VERSION.join(".") : "auto"),
+      );
       successLog(
         `✅ Estou pronto para uso! 
 Verifique o prefixo, digitando a palavra "prefixo" no WhatsApp. 
