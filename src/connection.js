@@ -201,7 +201,9 @@ O prefixo padrão definido no config.js é ${PREFIX}`,
     } else if (connection === "connecting") {
       infoLog("Conectando...");
     } else {
-      infoLog("Atualizando conexão...");
+      infoLog(
+        `Atualizando conexão... estado=${connection ?? "desconhecido"}`,
+      );
     }
   });
 
