@@ -76,29 +76,33 @@ import { load } from "./loader.js";
 import { badMacHandler } from "./utils/badMacHandler.js";
 import { bannerLog, errorLog, infoLog, warningLog } from "./utils/logger.js";
 
-process.on("uncaughtException", (error) => {
-  if (badMacHandler.handleError(error, "uncaughtException")) {
-    return;
-  }
+if (process.listenerCount("uncaughtException") === 0) {
+  process.on("uncaughtException", (error) => {
+    if (badMacHandler.handleError(error, "uncaughtException")) {
+      return;
+    }
 
-  errorLog(`Erro crítico não capturado: ${error.message}`);
-  errorLog(error.stack);
+    errorLog(`Erro crítico não capturado: ${error.message}`);
+    errorLog(error.stack);
 
-  if (
-    !error.message.includes("ENOTFOUND") &&
-    !error.message.includes("timeout")
-  ) {
-    process.exit(1);
-  }
-});
+    if (
+      !error.message.includes("ENOTFOUND") &&
+      !error.message.includes("timeout")
+    ) {
+      process.exit(1);
+    }
+  });
+}
 
-process.on("unhandledRejection", (reason) => {
-  if (badMacHandler.handleError(reason, "unhandledRejection")) {
-    return;
-  }
+if (process.listenerCount("unhandledRejection") === 0) {
+  process.on("unhandledRejection", (reason) => {
+    if (badMacHandler.handleError(reason, "unhandledRejection")) {
+      return;
+    }
 
-  errorLog(`Promessa rejeitada não tratada:`, reason);
-});
+    errorLog(`Promessa rejeitada não tratada:`, reason);
+  });
+}
 
 async function startBot() {
   try {
